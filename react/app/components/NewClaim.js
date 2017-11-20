@@ -17,10 +17,10 @@ class NewClaim extends React.Component {
         vehicle: null,
       },
       loading: false,
-      claimImgUrl: null
+      claimImgUrl: null,
+      success : false
     };
   }
-
   /**
    * @description 
    * @memberof NewClaim
@@ -79,7 +79,7 @@ class NewClaim extends React.Component {
           this.createClaim(response.data.url);
           this.setState(function () {
             return {
-              loading: false,
+              loading: true,
               error: null,
             };
           });
@@ -89,7 +89,8 @@ class NewClaim extends React.Component {
           this.setState(function () {
             return {
               loading: false,
-              error: err.data || err.statusText
+              error: err.data || err.statusText,
+              success : false
             };
           });
         }.bind(this))
@@ -120,7 +121,7 @@ class NewClaim extends React.Component {
         this.setState(function () {
           return {
             loading: false,
-            showResult: true
+            success: true
           };
         });
       }.bind(this))
@@ -129,7 +130,8 @@ class NewClaim extends React.Component {
         this.setState(function () {
           return {
             loading: false,
-            error: err.data || err.statusText
+            error: err.data || err.statusText,
+            success : false
           };
         });
       }.bind(this));
@@ -145,30 +147,66 @@ class NewClaim extends React.Component {
           </div>
             : ''
         }
-        <form className='column' noValidate>
-          <div className='form-group'>
-            <label htmlFor="exampleFile" className='form-control-label'>Browse file</label>
-            <input className='form-control' type="file" name="file" id="fileinput" />
-            {
-              this.state.claimImgUrl ? <img src={this.state.claimImgUrl} style={{ maxWidth: '100%' }} /> : ''
-            }
+
+        {
+          this.state.success ? <div className="alert alert-success" role="alert">
+            Your claim was successfylly reported. Please review your details below.
           </div>
-          <button
-            className='btn btn-primary'
-            type='button'
-            onClick={this.handleSubmit.bind(this)}
-            disabled={!this.state.claimImgUrl}>
-            Report Claim
+            :
+            <form className='column' noValidate>
+              <div className='form-group'>
+                <label htmlFor="exampleFile" className='form-control-label'>Browse file</label>
+                <input className='form-control' type="file" name="file" id="fileinput" />
+                {
+                  this.state.claimImgUrl ? <img src={this.state.claimImgUrl} style={{ maxWidth: '100%' }} /> : ''
+                }
+              </div>
+              <button
+                className='btn btn-primary'
+                type='button'
+                onClick={this.handleSubmit.bind(this)}
+                disabled={!this.state.claimImgUrl}>
+                Report Claim
         </button>
 
-          <button
-            className='btn btn-link'
-            type='button'
-            onClick={this.handleReset.bind(this)}>
-            Cancel
+              <button
+                className='btn btn-link'
+                type='button'
+                onClick={this.handleReset.bind(this)}>
+                Cancel
         </button>
 
-        </form>
+            </form>
+        }
+        {this.state.claim.id ?
+          <div className='claim-details'>
+            <div className='row mt-2'>
+              <div className='col-md-12 text-center'>
+                <h4 className='text-center'>{this.state.claim.plate}</h4>
+                Plate Number
+              </div>
+            </div>
+            <hr className='mb-4 mt-3' />
+            <div className="row">
+              <div className='col-md-12 text-center'>
+                <p>Make : <strong>{this.state.claim.vehicle.make}</strong></p>
+                <p>Model:<strong>{this.state.claim.vehicle.make_model}</strong></p>
+                <p>Color:<strong>{this.state.claim.vehicle.color}</strong></p>
+              </div>
+            </div>
+            <div className="row mb-3">
+              <div className='col-md-6'>
+                <p><strong>Cropped Image</strong></p>
+                <div><img src={this.state.claim.vehicleUrl} className='img-fluid' /> </div>
+              </div>
+              <div className='col-md-6'>
+                <p><strong>Scene Image</strong></p>
+                <div><img src={this.state.claim.imageUrl} className='img-fluid' /> </div>
+              </div>
+            </div>
+          </div>
+          : ''
+        }
       </div>
     )
   }
